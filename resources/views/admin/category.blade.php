@@ -7,6 +7,7 @@
 @section('header_subtitle', 'Manage your categories')
 
 @section('content')
+
     <div class="container-fluid">
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -88,6 +89,7 @@
                         {{ $categories->withQueryString()->links() }}
                     </div>
                 </div>
+
             </div>
         </div>
 

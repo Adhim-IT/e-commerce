@@ -15,71 +15,76 @@
             </button>
         </div>
 
-        <!-- Products Table -->
-        <div class="card shadow">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center">
-                            <input type="text" id="searchInput" class="form-control form-control-sm"
-                                placeholder="Search products...">
-                        </div>
-                    </div>
-
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Image</th>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($products as $product)
-                                <tr>
-                                    <td>
-                                        <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}"
-                                            class="img-thumbnail" style="max-width: 50px;">
-                                    </td>
-                                    <td>{{ $product['name'] }}</td>
-                                    <td>{{ $product['category'] }}</td>
-                                    <td>Rp {{ number_format($product['price'], 0, ',', '.') }}</td>
-                                    <td>{{ $product['stock'] }}</td>
-                                    <td>
-                                        <span class="badge {{ $product['stock'] > 0 ? 'bg-success' : 'bg-danger' }}">
-                                            {{ $product['stock'] > 0 ? 'In Stock' : 'Out of Stock' }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                                data-bs-target="#editProductModal{{ $product['id'] }}">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <form action="" method="POST" class="d-inline delete-form">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center">No products found</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+       <!-- Products Table -->
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center">
+                    <input type="text" id="searchInput" class="form-control form-control-sm"
+                        placeholder="Search products...">
                 </div>
             </div>
+
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($products as $product)
+                        <tr>
+                            <td>
+                                <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}"
+                                    class="img-thumbnail" style="max-width: 50px;">
+                            </td>
+                            <td>{{ $product['name'] }}</td>
+                            <td>{{ $product->category->name ?? 'No Category' }}</td>
+                            <td>Rp {{ number_format($product['price'], 0, ',', '.') }}</td>
+                            <td>{{ $product['stock'] }}</td>
+                            <td>
+                                <span class="badge {{ $product['stock'] > 0 ? 'bg-success' : 'bg-danger' }}">
+                                    {{ $product['stock'] > 0 ? 'In Stock' : 'Out of Stock' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
+                                        data-bs-target="#editProductModal{{ $product['id'] }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="d-inline delete-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center">No products found</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+        <!-- Pagination Links -->
+        <div class="mt-4">
+            {{ $products->links() }}
+        </div>
+    </div>
+</div>
+
 
         <!-- Add Product Modal -->
         <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel"
@@ -169,7 +174,7 @@
                 aria-labelledby="editProductModalLabel{{ $product['id'] }}" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <form action="" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="modal-header">

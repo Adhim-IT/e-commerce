@@ -28,8 +28,8 @@
                     <p class="px-3 text-uppercase small fw-medium mb-2 text-secondary sidebar-text">Catalog Management
                     </p>
 
-                    <a href=""
-                        class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-2 {{ request()->routeIs('admin.categories.*') ? 'active-nav' : 'text-secondary hover-nav' }}">
+                    <a href="{{route('admin.categories.index')}}"
+                        class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-2 {{ request()->routeIs('admin.categories.index') ? 'active-nav' : 'text-secondary hover-nav' }}">
                         <i class="bi bi-collection-fill"></i>
                         <span class="sidebar-text">Categories</span>
                     </a>
@@ -86,8 +86,15 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item text-danger" href="#"><i
-                                    class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </a>
+                        </li>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                     </ul>
                 </div>
             </div>

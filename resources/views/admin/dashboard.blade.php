@@ -81,7 +81,7 @@
                     </div>
                     <h3 class="text-gray-600 font-medium">Products</h3>
                 </div>
-                <span class="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">+23</span>
+                <span class="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">+12.5%</span>
             </div>
             <div class="flex items-baseline">
                 <p class="text-3xl font-bold text-gray-900">156</p>
