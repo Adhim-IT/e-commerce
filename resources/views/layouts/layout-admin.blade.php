@@ -13,18 +13,23 @@
     <style>
         body {
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
             background: #f5f6fa;
         }
 
         .layout-container {
+            flex: 1;
             display: flex;
-            min-height: 100vh;
-            position: relative;
+            flex-direction: column;
         }
 
         .content-wrapper {
             flex: 1;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
             transition: margin-left 0.3s ease;
         }
 
@@ -42,6 +47,10 @@
             .content-wrapper {
                 margin-left: 0;
             }
+        }
+
+        main {
+            flex: 1; /* Membuat konten utama fleksibel agar footer tetap di bawah */
         }
 
         ::-webkit-scrollbar {
@@ -62,6 +71,7 @@
             background: #555;
         }
     </style>
+
 </head>
 
 <body>
@@ -75,7 +85,9 @@
                 @yield('content')
             </main>
 
-            @include('partials.footer')
+            <div class="mt-auto">
+                @include('partials.footer')
+            </div>
         </div>
     </div>
 

@@ -3,7 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
-use App\Models\Category;
+use App\Http\Controllers\UserController;
+
 use Illuminate\Support\Facades\Route;
 
 //Landing Page Routes
@@ -53,4 +54,9 @@ Route::delete('/admin/products/{product}', [ProductController::class, "destroy"]
 Route::post('/admin/products', [ProductController::class, "store"])->name('admin.products.store');
 Route::put('/admin/products/{product}', [ProductController::class, "update"])->name('admin.products.update');
 
+//users managament
+Route::get( '/admin/users', [UserController::class, "index"])->name ('admin.users');
+Route::delete('/admin/users/{user}', [UserController::class, "destroy"])->name('admin.users.destroy');
+Route::post('/admin/users', [UserController::class, "store"])->name('admin.users.store');
+Route::put('/admin/users/{user}', [UserController::class, "update"])->name('admin.users.update');
 

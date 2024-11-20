@@ -21,6 +21,15 @@ class OrdersController extends Controller
                 ->onWhereHas('shipping_address' , 'like', "%{$search}%")
                 ->onWhereHas('resi_code' , 'like', "%{$search}%");
             });
-        });
+        })
+        ->when($request->status, function ($query, $status) {
+            if(in_array($status, ['paid', 'processing', 'shipped'])){
+                $query->where('status', $status);
+            }
+        })
+        ->latest()
+        ->paginate(5)
+        ->withQueryString();
+        
     }
 }

@@ -21,7 +21,7 @@ class CategoryController extends Controller
                 });
             })
             ->latest()
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString();
         return view('admin.category', compact('categories'));
     }
