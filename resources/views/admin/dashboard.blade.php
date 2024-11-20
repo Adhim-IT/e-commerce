@@ -95,6 +95,7 @@
                 <div class="text-center p-2 bg-gray-50 rounded-lg">
                     <p class="text-sm text-gray-500">Low Stock</p>
                     <p class="font-semibold text-red-500">14</p>
+
                 </div>
             </div>
         </div>
