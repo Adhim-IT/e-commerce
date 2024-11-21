@@ -48,6 +48,7 @@
                 margin-left: 0;
             }
         }
+        
 
         main {
             flex: 1; /* Membuat konten utama fleksibel agar footer tetap di bawah */
