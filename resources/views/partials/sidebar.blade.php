@@ -44,7 +44,7 @@
                 <div class="mt-4">
                     <p class="px-3 text-uppercase small fw-medium mb-2 text-secondary sidebar-text">Sales & Orders</p>
 
-                    <a href=""
+                    <a href="{{ route('admin.orders.index') }}" 
                         class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-2 {{ request()->routeIs('admin.orders.*') ? 'active-nav' : 'text-secondary hover-nav' }}">
                         <i class="bi bi-cart-check-fill"></i>
                         <span class="sidebar-text">Orders</span>
@@ -54,7 +54,7 @@
                 <div class="mt-4">
                     <p class="px-3 text-uppercase small fw-medium mb-2 text-secondary sidebar-text">User Management</p>
 
-                    <a href="{{ route('admin.users') }}"
+                    <a href="{{ route('admin.users.index') }}"
                         class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-2 {{ request()->routeIs('admin.users.*') ? 'active-nav' : 'text-secondary hover-nav' }}">
                         <i class="bi bi-people-fill"></i>
                         <span class="sidebar-text">Users</span>

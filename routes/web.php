@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 
@@ -55,8 +56,16 @@ Route::post('/admin/products', [ProductController::class, "store"])->name('admin
 Route::put('/admin/products/{product}', [ProductController::class, "update"])->name('admin.products.update');
 
 //users managament
-Route::get( '/admin/users', [UserController::class, "index"])->name ('admin.users');
-Route::delete('/admin/users/{user}', [UserController::class, "destroy"])->name('admin.users.destroy');
-Route::post('/admin/users', [UserController::class, "store"])->name('admin.users.store');
-Route::put('/admin/users/{user}', [UserController::class, "update"])->name('admin.users.update');
+Route::prefix('users')->group(function () {
+    Route::get('/', [UserController::class, "index"])->name('admin.users.index');
+    Route::post('/', [UserController::class, "store"])->name('admin.users.store');
+    Route::delete('/{user}', [UserController::class, "destroy"])->name('admin.users.destroy');
+    Route::put('/{user}', [UserController::class, "update"])->name('admin.users.update');
+});
+
+//order route
+Route::prefix('orders')->group(function () {
+    Route::get('/', [OrdersController::class, "index"])->name('admin.orders.index');
+    Route::patch('/{order}/status', [OrdersController::class, "updateStatus"])->name('admin.orders.updateStatus');
+});
 

@@ -30,6 +30,27 @@ class OrdersController extends Controller
         ->latest()
         ->paginate(5)
         ->withQueryString();
-        
+
+    }
+
+    public function updateStatus(Request $request, Order $order){
+        try{
+            $validated = $request->validate([
+                'status' => ['required', 'string', 'max:255'],
+                'resi'=>['required_if:status,shipped','string','nullable'],
+            ]);
+
+            if($request->status == 'shipped'){
+                if(empty($request->resi_code)){
+                    throw new \Exception('Resi code is required for shipped status');
+                }
+                $order->resi_code = $request->resi_code;
+                $order->save();
+            }
+            $order->updateStatus($request->status);
+            return redirect()->back()->with('success', 'Order status updated successfully');
+        }catch(\Exception $e){
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 }
