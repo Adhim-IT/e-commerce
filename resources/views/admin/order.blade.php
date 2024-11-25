@@ -7,7 +7,7 @@
 
 @section('content')
 
-    <div class="container-fluid">
+<div class="container-fluid">
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h3"> Order List</h1>
@@ -82,17 +82,20 @@
                                         </button>
                                     </td>
                                 </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center py-4">
-                                            <div class="d-flex flex-column align-items-center">
-                                                <i class="bi bi-inbox display-4 text-muted mb-2"></i>
-                                                <p class="text-muted mb-0">No Order Found</p>
-                                            </div>
-                                        </td>
-                                @endforeach
-                            </tbody>
-                        </table>
+                            @endforeach
+
+                            @if ($orders->isEmpty())
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="bi bi-inbox display-4 text-muted mb-2"></i>
+                                            <p class="text-muted mb-0">No Order Found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+
 
                         {{-- pagination --}}
                         <div class="mt-4 d-flex justify-content-between align-items-center">
@@ -103,6 +106,31 @@
                                 {{ $orders->links() }}
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
+        </div>
+
+        {{-- modal --}}
+        @foreach ($orders as $order)
+        {{-- order detail modal --}}
+            <div class="modal fade" id="orderDetailModal{{ $order->id }}" tabindex="-1" aria-labelledby="orderDetailModalLabel{{ $order->id }}">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <h5 class="modal-title fw-bold" id="orderDetailModallabel{{ $order->id }}" >
+                            <i class="bi bi-box-seam me-2"></i>Order #{{ $order->id }}
+                        </h5>
+                        <button type="button"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row gap-4">
+                            {{-- order status card --}}
+                            <div class="col-12">
+                                <div class="card borde-0 shadow-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        @endforeach
+</div>
+@endsection

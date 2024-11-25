@@ -31,6 +31,8 @@ class OrdersController extends Controller
         ->paginate(5)
         ->withQueryString();
 
+        return view('admin.order', compact('orders'));
+
     }
 
     public function updateStatus(Request $request, Order $order){
