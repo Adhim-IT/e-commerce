@@ -42,7 +42,8 @@
                             <input type="search" id="searchInput" placeholder="Search products..."
                                 class="w-full px-4 py-2 pl-10 pr-4 rounded-xl text-sm bg-gray-100 border border-transparent focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-colors">
                             <div class="absolute left-3 top-2.5">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
@@ -67,24 +68,36 @@
                         <a href="{{ route('register') }}"
                             class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-xl hover:opacity-90">Register</a>
                     @else
-                        <!-- Authenticated View -->
-                        <div class="relative">
-                            <button class="flex items-center space-x-2 text-gray-600 hover:text-emerald-600">
-                                <span>{{ Auth::user()->name }}</span>
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            {{-- <div
-                                class="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 text-gray-700 z-50 hidden group-hover:block">
-                                <a href="{{ route('profile') }}" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>
-                                </form>
-                            </div> --}}
+                    <div x-data="{ open: false }" class="relative">
+                        <!-- Dropdown Button -->
+                        <button @click="open = !open"
+                            class="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg shadow-sm hover:bg-emerald-100 hover:text-emerald-600 focus:outline-none transition duration-200">
+                            <span>{{ Auth::user()->name }}</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    
+                        <!-- Dropdown Menu -->
+                        <div x-show="open" 
+                             @click.away="open = false" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                            <form method="POST" action="{{ route('logout') }}" class="py-2">
+                                @csrf
+                                <button type="submit"
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-emerald-100 hover:text-emerald-600 transition duration-200">
+                                    Logout
+                                </button>
+                            </form>
                         </div>
+                    </div>
+                    
                     @endguest
                 </div>
             </div>

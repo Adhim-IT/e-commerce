@@ -1,15 +1,15 @@
 @extends('layouts.layout-admin')
 
-@section('title', 'Order')
+@section('title', 'Order History')
 
-@section('header_title', 'Order')
-@section('header_subtitle', 'Manage your order')
+@section('header_title', 'Order History')
+@section('header_subtitle', 'View all orders history')
 
 @section('content')
     <div class="container-fluid">
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3">Order List</h1>
+            <h1 class="h3">Order History</h1>
         </div>
 
         <!-- Order Table -->
@@ -18,15 +18,14 @@
                 <div class="table-responsive">
                     {{-- search --}}
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <form action="{{ route('admin.orders.index') }}" method="GET"
+                        <form action="{{ route('admin.orders.history') }}" method="GET"
                             class="d-flex align-items-center gap-2">
-
                             <div class="input-group">
                                 <input type="text" name="search" class="form-control form-control-sm"
                                     placeholder="Search orders ID..." value="{{ request('search') }}">
                                 <select name="status" class="form-select form-select-sm" id="">
                                     <option value="">All Status</option>
-                                    @foreach (['processing', 'shipped'] as $status)
+                                    @foreach (['processing', 'shipped', 'completed', 'cancelled'] as $status)
                                         <option value="{{ $status }}"
                                             {{ request('status') == $status ? 'selected' : '' }}>
                                             {{ ucfirst($status) }}
@@ -38,8 +37,8 @@
                                 </button>
                             </div>
                             @if (request('search') || request('status'))
-                                <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-x-circle me-1"></i>
+                                <a href="{{ route('admin.orders.history') }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-x-circle me-1"></i>Clear
                                 </a>
                             @endif
                         </form>
@@ -76,11 +75,6 @@
                                             data-bs-target="#orderDetailModal{{ $order->id }}">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#UpdateStatusModal{{ $order->id }}"
-                                            @if (empty($order->getNextPossibleStatuses())) disabled @endif>
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -98,8 +92,13 @@
                         </tbody>
                     </table>
                     {{-- pagination --}}
-                    <div class="mt-4">
-                        {{ $orders->links() }}
+                    <div class="mt-4 d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            Showing {{ $orders->firstItem() }} to {{ $orders->lastItem() }} of {{ $orders->total() }}
+                        </div>
+                        <div>
+                            {{ $orders->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -225,140 +224,82 @@
                                                     <thead class="bg-light">
                                                         <tr>
                                                             <th>Product</th>
-                                                            <th class="text-end">Price</th>
-                                                            <th class="text-end">Quantity</th>
-                                                            <th class="text-end">SubTotal</th>
+                                                            <th>Unit Price</th>
+                                                            <th>Quantity</th>
+                                                            <th>Subtotal</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @foreach ($order->items as $item)
+                                                        @foreach ($order->orderItems as $item)
                                                             <tr>
-                                                                <td>{{ $item->product->name }}</td>
-                                                                <td class="text-end">Rp
-                                                                    {{ number_format($item->product->price, 0, ',', '.') }}
+                                                                <td>
+                                                                    <div class="d-flex gap-3">
+                                                                        <img src="{{ $item->product->image ?? asset('assets/images/default.png') }}"
+                                                                            alt="{{ $item->product->name }}"
+                                                                            class="rounded" width="40"
+                                                                            height="40">
+                                                                        <p class="mb-0 fw-medium">
+                                                                            {{ $item->product->name }}
+                                                                        </p>
+                                                                    </div>
                                                                 </td>
-                                                                <td class="text-end">{{ $item->quantity }}</td>
-                                                                <td class="text-end">Rp
-                                                                    {{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}
+                                                                <td>Rp {{ number_format($item->unit_price, 0, ',', '.') }}
+                                                                </td>
+                                                                <td>{{ $item->quantity }}</td>
+                                                                <td>Rp
+                                                                    {{ number_format($item->unit_price * $item->quantity, 0, ',', '.') }}
                                                                 </td>
                                                             </tr>
                                                         @endforeach
-                                                    </tbody>
-                                                    <tfoot class="border-top">
                                                         <tr>
-                                                            <td colspan="3" class="text-end fw-medium">Total</td>
-                                                            <td class="text-end fw-medium">Rp
-                                                                {{ number_format($order->total_amount, 0, ',', '.') }}</td>
+                                                            <td colspan="3">
+                                                                <div class="fw-medium">Total:</div>
+                                                            </td>
+                                                            <td class="fw-bold">
+                                                                Rp {{ number_format($order->total_amount, 0, ',', '.') }}
+                                                            </td>
                                                         </tr>
-                                                    </tfoot>
+                                                    </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer border-0 pt-8">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-
-            {{-- update status modal --}}
-            <div class="modal fade" id="UpdateStatusModal{{ $order->id }}" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <div class="modal-header">
-                                <h5 class="modal-title">Update Order Status #{{ $order->id }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label class="form-label">Current Status</label>
-                                    <div>
-                                        <span class="badge bg-{{ $order->status_color }}">{{ ucfirst($order->status) }}
-                                        </span>
+                                {{-- action --}}
+                                <div class="col-12">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h6 class="card-title mb-3">
+                                                <i class="bi bi-gear me-2"></i>Action
+                                            </h6>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <a href="{{ route('admin.orders.update-status', ['id' => $order->id, 'status' => 'processing']) }}"
+                                                    class="btn btn-sm btn-warning">
+                                                    <i class="bi bi-gear"></i> Processing
+                                                </a>
+                                                <a href="{{ route('admin.orders.update-status', ['id' => $order->id, 'status' => 'shipped']) }}"
+                                                    class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-truck"></i> Shipped
+                                                </a>
+                                                <a href="{{ route('admin.orders.update-status', ['id' => $order->id, 'status' => 'completed']) }}"
+                                                    class="btn btn-sm btn-success">
+                                                    <i class="bi bi-check-circle"></i> Completed
+                                                </a>
+                                                <a href="{{ route('admin.orders.update-status', ['id' => $order->id, 'status' => 'cancelled']) }}"
+                                                    class="btn btn-sm btn-danger">
+                                                    <i class="bi bi-x-circle"></i> Cancelled
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">New Status</label>
-                                    <select name="status" class="form-select status-select" required>
-                                        <option value="">Select Status</option>
-                                        @foreach ($order->getNextPossibleStatuses() as $status)
-                                            <option value="{{ $status }}"
-                                                @if ($status == 'cancelled') class="text-danger" @endif>
-                                                {{ ucfirst($status) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @if (empty($order->getNextPossibleStatuses()))
-                                        <small class="text-muted">No Status changes available</small>
-                                    @endif
-                                </div>
-                                <div class="mb-3" id="resiField{{ $order->id }}" style="display: none">
-                                    <label class="form-label">Resi Number</label>
-                                    <input type="text" name="resi_code" class="form-control"
-                                        placeholder="Enter Resi Number">
-                                    <div class="form-text">Required for shipped status</div>
-                                </div>
+                                {{-- end of modal --}}
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                @if (!empty($order->getNextPossibleStatuses()))
-                                    <button type="submit" class="btn btn-primary">Update Status</button>
-                                @endif
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
+        @endforeach
     </div>
-    @endforeach
 @endsection
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: "{{ session('success') }}",
-                showConfirmButton: false,
-                timer: 3000,
-                toast: true,
-                position: 'top-end'
-            });
-        @endif
-
-        // Show error message
-        @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: "{{ session('error') }}",
-                showConfirmButton: true
-            });
-        @endif
-        document.querySelectorAll('select[name="status"]').forEach(select => {
-            select.addEventListener('change', function() {
-                const modal = this.closest('.modal');
-                const resiField = modal.querySelector('[id^=resiField]');
-                const resiInput = resiField.querySelector('input');
-
-                if (this.value === 'shipped') {
-                    resiField.style.display = 'block';
-                    resiInput.required = true;
-                } else {
-                    resiField.style.display = 'none';
-                    resiInput.required = false;
-                }
-            });
-        });
-    </script>
-@endpush

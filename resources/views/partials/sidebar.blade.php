@@ -43,12 +43,17 @@
 
                 <div class="mt-4">
                     <p class="px-3 text-uppercase small fw-medium mb-2 text-secondary sidebar-text">Sales & Orders</p>
-
-                    <a href="{{ route('admin.orders.index') }}" 
+                    <a href="{{ route('admin.orders.index') }}"
                         class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-2 {{ request()->routeIs('admin.orders.*') ? 'active-nav' : 'text-secondary hover-nav' }}">
                         <i class="bi bi-cart-check-fill"></i>
                         <span class="sidebar-text">Orders</span>
                     </a>
+                    {{-- <a href="{{route('admin.order-historis.index')}}">
+                        <div class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-2 {{ request()->routeIs('admin.order-historis.*') ? 'active-nav' : 'text-secondary hover-nav' }}">
+                            <i class="bi bi-clock-history"></i>
+                            <span class="sidebar-text">Order History</span>
+                        </div>
+                    </a> --}}
                 </div>
 
                 <div class="mt-4">

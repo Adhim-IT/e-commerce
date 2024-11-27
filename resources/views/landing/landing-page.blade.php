@@ -33,96 +33,51 @@
     <!-- Products Section -->
     <div id="featured-products" class="products-section bg-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Featured Products</h2>
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900">Featured Products</h2>
-                <select
-                    class="px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
-                    <option>All Products</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                    <option>Newest</option>
-                </select>
+                <form action="{{ route('home') }}" method="GET" class="flex flex-1 space-x-4">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..." class="px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 flex-1">
+                    <button type="submit" class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+                        Apply Filltrs
+                    </button>
+                </form>
+                <div class="flex items-center space-x-4">
+                    <select name="category" class="px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
+                        <option value="">All Categories</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <select name="sort" onchange="this.form.submit()" class="px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
+                        <option value="" {{ is_null(request('sort')) ? 'selected' : '' }}>All Products</option>
+                        <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                        <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                        <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Newest</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- Products Grid -->
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <!-- Product Card 1 -->
-                <div
-                    class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
-                    <img src="https://via.placeholder.com/300" alt="Product" class="w-full h-72 object-cover">
-                    <div class="p-4">
-                        <h3 class="product-name text-lg font-medium text-gray-900">Modern Laptop</h3>
-                        <p class="product-description mt-1 text-sm text-gray-500">High-performance laptop with the latest
-                            features.</p>
-                        <div class="mt-4 flex items-center justify-between">
-                            <p class="text-lg font-semibold text-emerald-600">Rp 12.999.000</p>
-                            <button
-                                class="add-to-cart px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
-                                Add to Cart
-                            </button>
+                @forelse ($products as $product)
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
+                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-72 object-cover">
+                        <div class="p-4">
+                            <h3 class="product-name text-lg font-medium text-gray-900">{{ $product->name }}</h3>
+                            <p class="product-description mt-1 text-sm text-gray-500">{{ $product->description }}</p>
+                            <div class="mt-4 flex items-center justify-between">
+                                <p class="text-lg font-semibold text-emerald-600">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                                <button class="add-to-cart px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+                                    Add to Cart
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Product Card 2 -->
-                <div
-                    class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
-                    <img src="https://via.placeholder.com/300" alt="Product" class="w-full h-72 object-cover">
-                    <div class="p-4">
-                        <h3 class="product-name text-lg font-medium text-gray-900">Wireless Earbuds</h3>
-                        <p class="product-description mt-1 text-sm text-gray-500">Premium wireless earbuds with noise
-                            cancellation.</p>
-                        <div class="mt-4 flex items-center justify-between">
-                            <p class="text-lg font-semibold text-emerald-600">Rp 1.899.000</p>
-                            <button
-                                class="add-to-cart px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
-                                Add to Cart
-                            </button>
-                        </div>
+                @empty
+                    <div class="col-span-full text-center py-12">
+                        <h3 class="text-lg font-medium text-gray-900">No products found</h3>
+                        <p class="mt-2 text-gray-500">Try adjusting your search terms</p>
                     </div>
-                </div>
-
-                <!-- Product Card 3 -->
-                <div
-                    class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
-                    <img src="https://via.placeholder.com/300" alt="Product" class="w-full h-72 object-cover">
-                    <div class="p-4">
-                        <h3 class="product-name text-lg font-medium text-gray-900">Smart Watch</h3>
-                        <p class="product-description mt-1 text-sm text-gray-500">Feature-rich smartwatch with health
-                            monitoring.</p>
-                        <div class="mt-4 flex items-center justify-between">
-                            <p class="text-lg font-semibold text-emerald-600">Rp 2.499.000</p>
-                            <button
-                                class="add-to-cart px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 4 -->
-                <div
-                    class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
-                    <img src="https://via.placeholder.com/300" alt="Product" class="w-full h-72 object-cover">
-                    <div class="p-4">
-                        <h3 class="product-name text-lg font-medium text-gray-900">Digital Camera</h3>
-                        <p class="product-description mt-1 text-sm text-gray-500">Professional digital camera for
-                            photography enthusiasts.</p>
-                        <div class="mt-4 flex items-center justify-between">
-                            <p class="text-lg font-semibold text-emerald-600">Rp 8.999.000</p>
-                            <button
-                                class="add-to-cart px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- No Results Message -->
-            <div id="noResults" class="hidden text-center py-12">
-                <h3 class="text-lg font-medium text-gray-900">No products found</h3>
-                <p class="mt-2 text-gray-500">Try adjusting your search terms</p>
+                @endforelse
             </div>
         </div>
     </div>
@@ -136,10 +91,8 @@
                 <form id="newsletter-form" class="max-w-md mx-auto">
                     @csrf
                     <div class="flex gap-4">
-                        <input type="email" name="email" placeholder="Enter your email"
-                            class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
-                        <button type="submit"
-                            class="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+                        <input type="email" name="email" placeholder="Enter your email" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
+                        <button type="submit" class="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
                             Subscribe
                         </button>
                     </div>
