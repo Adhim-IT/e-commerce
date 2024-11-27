@@ -9,60 +9,46 @@ use Illuminate\Http\Request;
 
 class UserLandingController extends Controller
 {
+
+
     public function index(Request $request)
     {
-        // Mengambil semua kategori
-        $categories = Category::all();
-    
-        // Query untuk produk
-        $query = Product::query()
-            ->active()
-            ->inStock();
-    
-        // Filter pencarian
-        if ($request->search) {
-            $query->where('name', 'like', "%{$request->search}%");
+        $limit = 8; // Batas produk per halaman
+        $offset = $request->input('offset', 0);
+
+        $products = Product::query();
+
+        // Filter berdasarkan nama produk
+        if ($search = $request->input('search')) {
+            $products->where('name', 'like', "%{$search}%");
         }
-    
+
         // Filter berdasarkan kategori
-        if ($request->category) {
-            $query->where('category_id', $request->category);
+        if ($category = $request->input('category')) {
+            $products->where('category_id', $category);
         }
-    
-        // Filter berdasarkan pengurutan
-        if ($request->sort) {
-            switch ($request->sort) {
-                case 'price_low':
-                    $query->orderBy('price');
-                    break;
-                case 'price_high':
-                    $query->orderBy('price', 'desc');
-                    break;
-                case 'latest':
-                    $query->latest();
-                    break;
-                default:
-                    $query->oldest();
-                    break;
+
+        // Sorting
+        if ($sort = $request->input('sort')) {
+            if ($sort === 'price_low') {
+                $products->orderBy('price', 'asc');
+            } elseif ($sort === 'price_high') {
+                $products->orderBy('price', 'desc');
+            } elseif ($sort === 'latest') {
+                $products->orderBy('created_at', 'desc');
             }
-        } else {
-            $query->latest();
         }
-    
-        // Mengambil data produk dengan pagination
-        $products = $query->paginate(10);
-    
-        // Menyimpan parameter pencarian untuk pagination
-        $products->appends($request->all());
-    
-        // Mengirim data ke view
-        return view('landing.landing-page', [
-            'products' => $products,
-            'categories' => $categories,
-            'search' => $request->search,
-            'currentCategory' => $request->category,
-            'currentSort' => $request->sort,
-        ]);
+
+        // Terapkan limit dan offset
+        $products = $products->skip($offset)->take($limit)->get();
+
+        // Jika permintaan AJAX, kembalikan partial view produk
+        if ($request->ajax()) {
+            return view('landing.products', compact('products'))->render();
+        }
+
+        // Permintaan biasa
+        $categories = Category::all();
+        return view('landing.landing-page', compact('products', 'categories', 'limit'));
     }
-    
 }

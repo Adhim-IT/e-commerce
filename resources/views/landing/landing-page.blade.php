@@ -35,52 +35,73 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">Featured Products</h2>
             <div class="flex justify-between items-center mb-8">
-                <form action="{{ route('home') }}" method="GET" class="flex flex-1 space-x-4">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..." class="px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 flex-1">
-                    <button type="submit" class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
-                        Apply Filltrs
-                    </button>
+                <form id="filterForm" action="{{ route('home') }}" method="GET" class="w-full space-y-4 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
+                    <!-- Search input -->
+                    <div class="flex-1">
+                        <input 
+                            id="searchInput"
+                            type="text" 
+                            name="search" 
+                            value="{{ request('search') }}" 
+                            placeholder="Search products..." 
+                            class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
+                    </div>
+            
+                    <!-- Category dropdown -->
+                    <div>
+                        <select 
+                            id="categorySelect"
+                            name="category" 
+                            class="w-full sm:w-auto px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
+                            <option value="">All Categories</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+            
+                    <!-- Sort dropdown -->
+                    <div>
+                        <select 
+                            id="sortSelect"
+                            name="sort" 
+                            class="w-full sm:w-auto px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
+                            <option value="" {{ is_null(request('sort')) ? 'selected' : '' }}>All Products</option>
+                            <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                            <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                            <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Newest</option>
+                        </select>
+                    </div>
+            
+                    <!-- Search button -->
+                    <div>
+                        <button 
+                            type="submit" 
+                            class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+                            Search
+                        </button>
+                    </div>
                 </form>
-                <div class="flex items-center space-x-4">
-                    <select name="category" class="px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
-                        <option value="">All Categories</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                    <select name="sort" onchange="this.form.submit()" class="px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
-                        <option value="" {{ is_null(request('sort')) ? 'selected' : '' }}>All Products</option>
-                        <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                        <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-                        <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Newest</option>
-                    </select>
-                </div>
             </div>
-
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                @forelse ($products as $product)
-                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
-                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-72 object-cover">
-                        <div class="p-4">
-                            <h3 class="product-name text-lg font-medium text-gray-900">{{ $product->name }}</h3>
-                            <p class="product-description mt-1 text-sm text-gray-500">{{ $product->description }}</p>
-                            <div class="mt-4 flex items-center justify-between">
-                                <p class="text-lg font-semibold text-emerald-600">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                                <button class="add-to-cart px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="col-span-full text-center py-12">
-                        <h3 class="text-lg font-medium text-gray-900">No products found</h3>
-                        <p class="mt-2 text-gray-500">Try adjusting your search terms</p>
-                    </div>
-                @endforelse
+    
+            <div id="productsContainer">
+                @include('landing.products', ['products' => $products])
+            </div>
+    
+            <div id="loadMoreContainer" class="text-center mt-8">
+                @if ($products->count() >= $limit) <!-- $limit adalah batas awal data -->
+                    <button 
+                        id="loadMoreButton" 
+                        class="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+                        Load More
+                    </button>
+                @endif
             </div>
         </div>
     </div>
+    
 
     <!-- Newsletter Section -->
     <div id="newsletter-section" class="bg-emerald-50 py-12">
