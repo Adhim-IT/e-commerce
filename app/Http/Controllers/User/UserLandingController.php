@@ -9,46 +9,41 @@ use Illuminate\Http\Request;
 
 class UserLandingController extends Controller
 {
-
-
     public function index(Request $request)
-    {
-        $limit = 8; // Batas produk per halaman
-        $offset = $request->input('offset', 0);
+{
+    $categories = Category::all();
+    $query = Product::query()->active()->inStock();
 
-        $products = Product::query();
-
-        // Filter berdasarkan nama produk
-        if ($search = $request->input('search')) {
-            $products->where('name', 'like', "%{$search}%");
-        }
-
-        // Filter berdasarkan kategori
-        if ($category = $request->input('category')) {
-            $products->where('category_id', $category);
-        }
-
-        // Sorting
-        if ($sort = $request->input('sort')) {
-            if ($sort === 'price_low') {
-                $products->orderBy('price', 'asc');
-            } elseif ($sort === 'price_high') {
-                $products->orderBy('price', 'desc');
-            } elseif ($sort === 'latest') {
-                $products->orderBy('created_at', 'desc');
-            }
-        }
-
-        // Terapkan limit dan offset
-        $products = $products->skip($offset)->take($limit)->get();
-
-        // Jika permintaan AJAX, kembalikan partial view produk
-        if ($request->ajax()) {
-            return view('landing.products', compact('products'))->render();
-        }
-
-        // Permintaan biasa
-        $categories = Category::all();
-        return view('landing.landing-page', compact('products', 'categories', 'limit'));
+    if ($request->search) {
+        $query->where('name', 'like', "%{$request->search}%");
     }
+    if ($request->category) {
+        $query->where('category_id', $request->category);
+    }
+    if ($request->sort) {
+        switch ($request->sort) {
+            case 'price_low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'latest':
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+    } else {
+        $query->latest();
+    }
+
+    $products = $query->paginate(8);
+    $products->appends($request->all());
+
+    if ($request->ajax()) {
+        return view('partials.product-user', compact('products'))->render();
+    }
+
+    return view('landing.landing-page', compact('products', 'categories'));
+}
+
 }
