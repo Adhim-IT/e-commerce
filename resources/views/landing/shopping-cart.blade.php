@@ -47,6 +47,10 @@
                         @if (auth()->check())
                             <button data-action="checkout"
                                 class="mt-6 w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                                Proceed to Checkout
+                            </button>
+                            <button id="payButton"
+                                class="mt-6 w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2" hidden>
                                 Pay Now
                             </button>
                         @else
@@ -66,6 +70,8 @@
 
 
 @push('scripts')
+    <script src="{{ config('midtrans.payment_url') }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 @endpush
 
 {{-- <div class="flex items-center">

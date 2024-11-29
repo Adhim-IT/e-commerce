@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\User\UserCheckoutController;
 use App\Http\Controllers\User\UserLandingController;
 use App\Http\Controllers\UserController;
 
@@ -71,3 +72,6 @@ Route::middleware('isAdmin')->group(function () {
     //     Route::get('update-status/{id}/{status}', [OrderHistoryController::class, 'updateStatus'])->name('update-status');
     // });
 });
+
+Route::post('/checkout/process', [UserCheckoutController::class, "process"])->name('checkout.process');
+// Route::post('/payments/update-status', [UserCheckoutController::class, "updateStatus"])->name('payments.update-status');

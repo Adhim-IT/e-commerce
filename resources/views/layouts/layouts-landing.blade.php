@@ -60,7 +60,7 @@
                         <span id="cart-count" class="cart-badge absolute -top-2 -right-2 bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
 
                     </a>
-
+                    {{-- <a href="/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-emerald-600">Order</a> --}}
                     <!-- Auth Links -->
                     @guest
                     <!-- Guest View -->
@@ -81,7 +81,7 @@
                         </button>
 
                         <!-- Dropdown Menu -->
-                        {{-- <div x-show="open"
+                        <div x-show="open"
                             @click.away="open = false"
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 scale-95"
@@ -97,7 +97,7 @@
                                     Logout
                                 </button>
                             </form>
-                        </div> --}}
+                        </div>
                     </div>
                     @endguest
                 </div>

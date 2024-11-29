@@ -37,6 +37,30 @@ class ShoppingCart {
         cartCount.textContent = totalItems;
         cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
     }
+    // addItem(product) {
+    //     if (!product?.id) return;
+    //     try {
+    //         const existingItem = this.items.find(item => item.id === parseInt(product.id));
+    //         if (existingItem) {
+    //             existingItem.quantity += 1;
+    //         } else {
+    //             this.items.push({
+    //                 id: parseInt(product.id),
+    //                 name: product.name,
+    //                 price: parseFloat(product.price),
+    //                 image: product.image,
+    //                 category: product.category_name,
+    //                 quantity: 1
+    //             });
+    //         }
+    //         this.saveCartToStoreStorage();
+    //         this.updateCartCount();
+    //         this.showNotification(`1 ${product.name} added to cart`);
+    //     } catch (error) {
+    //         console.error(error);
+    //         this.showNotification('Error adding item to cart');
+    //     }
+    // }
     addItem(product) {
         if (!product?.id) return;
         try {
@@ -55,6 +79,7 @@ class ShoppingCart {
             }
             this.saveCartToStoreStorage();
             this.updateCartCount();
+            this.updateCartUI();
             this.showNotification(`1 ${product.name} added to cart`);
         } catch (error) {
             console.error(error);
@@ -62,17 +87,49 @@ class ShoppingCart {
         }
     }
 
+
+    // removeItem(productId) {
+    //     try {
+    //         this.items = this.items.filter(item => item.id !== parseInt(productId));
+    //         this.saveCartToStoreStorage();
+    //         this.updateCartCount();
+    //         this.showNotification('Item removed from cart');
+    //     } catch (error) {
+    //         console.error(error);
+    //         this.showNotification('Error removing item from cart');
+    //     }
+    // }
     removeItem(productId) {
         try {
             this.items = this.items.filter(item => item.id !== parseInt(productId));
             this.saveCartToStoreStorage();
             this.updateCartCount();
+            this.updateCartUI(); // Tambahkan ini untuk memperbarui UI secara langsung
             this.showNotification('Item removed from cart');
         } catch (error) {
             console.error(error);
             this.showNotification('Error removing item from cart');
         }
     }
+
+    // updateQuantity(productId, changeAmount) {
+    //     try {
+    //         const item = this.items.find(item => item.id === parseInt(productId));
+    //         if (!item) return;
+
+    //         const newQuantity = item.quantity + changeAmount;
+    //         if (newQuantity < 1) {
+    //             this.removeItem(productId);
+    //             return;
+    //         }
+    //         item.quantity = newQuantity;
+    //         this.saveCartToStoreStorage();
+    //         this.updateCartCount();
+    //     } catch (error) {
+    //         console.error(error);
+    //         this.showNotification('Error updating cart count');
+    //     }
+    // }
     updateQuantity(productId, changeAmount) {
         try {
             const item = this.items.find(item => item.id === parseInt(productId));
@@ -86,6 +143,7 @@ class ShoppingCart {
             item.quantity = newQuantity;
             this.saveCartToStoreStorage();
             this.updateCartCount();
+            this.updateCartUI(); // Tambahkan ini untuk memperbarui UI secara langsung
         } catch (error) {
             console.error(error);
             this.showNotification('Error updating cart count');
@@ -133,11 +191,11 @@ class ShoppingCart {
             total: document.querySelector('[data-summary="total"]'),
             checkout: document.querySelector('[data-summary="checkout"]'),
         };
-    
+
         if (elements.subtotal) elements.subtotal.textContent = this.formatPrice(subtotal);
         if (elements.shipping) elements.shipping.textContent = this.formatPrice(shipping);
         if (elements.total) elements.total.textContent = this.formatPrice(subtotal + shipping);
-    
+
         if (elements.checkout) {
             const isDisabled = this.items.length === 0;
             elements.checkout.disabled = isDisabled;
@@ -146,7 +204,7 @@ class ShoppingCart {
                 : 'mt-6 w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700';
         }
     }
-    
+
 
     createCartItemElement(item) {
         const div = document.createElement('div');
@@ -159,12 +217,19 @@ class ShoppingCart {
                 <p class="mt-1 text-sm text-gray-500">${item.category}</p>
                 <div class="mt-2 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        <button type="button" class="quantity-btn p-1 rounded-md hover:bg-gray-100" data-action="decrease" data-product-id="${item.id}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                            </svg>
-                        </button>
-                    </div>
+    <button type="button" class="quantity-btn p-1 rounded-md hover:bg-gray-100" data-action="decrease" data-product-id="${item.id}">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+        </svg>
+    </button>
+    <span class="quantity-value text-gray-700 font-medium" id="quantity-${item.id}">${item.quantity}</span>
+    <button type="button" class="quantity-btn p-1 rounded-md hover:bg-gray-100" data-action="increase" data-product-id="${item.id}">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+    </button>
+</div>
+
                     <span class="font-medium text-gray-900">
                         ${this.formatPrice(item.price * item.quantity)}
                     </span>
@@ -183,7 +248,7 @@ class ShoppingCart {
     updateCartUI() {
         const cartContainer = document.querySelector('.cart-items');
         if (!cartContainer) return;
-    
+
         cartContainer.innerHTML = '';
         if (this.items.length === 0) {
             cartContainer.innerHTML = `
@@ -197,22 +262,23 @@ class ShoppingCart {
             this.updateOrderSummary(0, 0);
             return;
         }
-    
+
         const cartContent = document.createElement('div');
         cartContent.className = 'cart-content';
-    
+
         this.items.forEach(item => {
             cartContent.appendChild(this.createCartItemElement(item));
         });
-    
+
         cartContainer.appendChild(cartContent);
-    
+
         // Hitung subtotal dan panggil updateOrderSummary
         const subtotal = this.calculateSubTotal();
         const shipping = this.SHIPPING_COST;
         this.updateOrderSummary(subtotal, shipping);
     }
-    
+
+
     attachItemEventListeners(elements, productId) {
         elements.addEventListener('click', (e) => {
             const target = e.target.closest('[data-action]');
@@ -232,29 +298,11 @@ class ShoppingCart {
                 case 'remove':
                         this.removeItem(productId);
                         break;
-                    
+
             }
         });
     }
-
-    // attachEventListeners() {
-    //     const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-    //     addToCartButtons.forEach(button => {
-    //         button.addEventListener('click', (e) => {
-    //             const productCard = e.target.closest('.product-card');
-    //             if (productCard) {
-    //                 const product = {
-    //                     id: productCard.dataset.id,
-    //                     name: productCard.dataset.name,
-    //                     price: productCard.dataset.price,
-    //                     image: productCard.dataset.image,
-    //                     category_name: productCard.dataset.category
-    //                 };
-    //                 this.addItem(product);
-    //             }
-    //         });
-    //     });
-    // }
+    
     attachEventListeners() {
         document.addEventListener('click', (e) => {
             const addToCartButton = e.target.closest('.add-to-cart-btn');
@@ -272,32 +320,8 @@ class ShoppingCart {
                 category_name: productCard.dataset.category
             };
             this.addItem(product);
+            this.updateCartUI(); // Pastikan UI diperbarui
         });
-
-        const checkoutButton = document.querySelector('[data-action="checkout"]');
-        if(checkoutButton){
-            checkoutButton.addEventListener('click' , (e) => {
-                e.preventDefault();
-                if(this,this.items.length === 0) return;
-
-                const shippingForm = document.getElementById('shippingForm');
-                if(!shippingForm) return;
-
-                shippingForm.classList.remove('hidden');
-                checkoutButton.classList,add('hidden');
-                const payButton = document.getElementById('payButton');
-                if(payButton) payButton.classList.remove('hidden');
-            });
-        }
-
-        const payButton = document.getElementById('payButton');
-        if(payButton){
-            payButton.addEventListener('click' , (e) => {
-                e.preventDefault();
-                this.processPayment();
-            });
-        }
-
     }
 
     async processPayment() {
@@ -310,8 +334,75 @@ class ShoppingCart {
         const payButton = document.getElementById('payButton');
         if(payButton) {
             payButton.disabled = true;
-            payButton.textContent = ''
+            payButton.textContent = 'Processing Payment...';
         }
+
+        try{
+            const response = await fetch('/checkout/process', {
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+                },
+                body: JSON.stringify({
+                    name: formData.get('name'),
+                    phone: formData.get('phone'),
+                    shipping_address: formData.get('shipping_address'),
+                    notes: formData.get('notes'),
+                    cart: this.items
+                })
+            });
+            if(!response.ok){
+                const error = await response.json();
+                throw new Error(error.message || 'Payment Processing failed');
+            }
+
+            const data = await response.json();
+            if(!data.status === 'success' || !data.snap_token){
+                throw new Error(error.message || 'Invalid Payment Response');
+            }
+            this.handlePayment(data.snap_token, data.order_id, payButton);
+        }catch(error){
+            console.error('payment error',error);
+            this.showNotification(error.message || 'gagal proses bayar', 'error');
+            if(payButton){
+                payButton.disabled = false
+                payButton.textContent = 'Pay Now';
+            }
+        }
+    }
+    handlePayment(snapToken, orderId, payButton){
+        window.snap.pay(snapToken, {
+            onSuccess: async(result) => {
+                await this.updateTransactionStatus(orderId, result, 'paid');
+                this.items=[];
+                this.saveCartToStoreStorage();
+                window.location.href = '/orders';
+            },
+            onPending: async (result) =>{
+                await this.updateTransactionStatus(orderId, result, 'pending');
+                this.items=[];
+                this.saveCartToStoreStorage();
+                window.location.href = '/orders';
+            },
+            onError: async (result) =>{
+                await this.updateTransactionStatus(orderId, result, 'Cancel');
+                this.showNotification('pembayaran gagal', 'error');
+                if(payButton){
+                    payButton.disabled = false
+                    payButton.textContent = 'Pay Now';
+                }
+            },
+            onClose: () => {
+                if(confirm('Apakah Anda Ingin melanjutkan pembayaran')){
+                    window.location.href = '/orders';
+                }else if (payButton){
+                    payButton.disabled = false
+                    payButton.textContent = 'Pay Now';
+                }
+            }
+        })
     }
 
 }
