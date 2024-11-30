@@ -184,5 +184,7 @@
         </div>
     </footer>
 </body>
-
+<script src="{{ config('midtrans.payment_url') }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    {{-- <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-PS1I8nolVogAFXyg"></script> --}}
+    <script src="{{ asset('js/app.js') }}"></script>
 </html>

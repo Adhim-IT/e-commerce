@@ -45,7 +45,7 @@
                         </dl>
 
                         @if (auth()->check())
-                            <button data-action="checkout"
+                            <button data-summary="checkout"
                                 class="mt-6 w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                                 Proceed to Checkout
                             </button>
@@ -71,39 +71,7 @@
 
 @push('scripts')
     <script src="{{ config('midtrans.payment_url') }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    {{-- <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-PS1I8nolVogAFXyg"></script> --}}
     <script src="{{ asset('js/app.js') }}"></script>
 @endpush
 
-{{-- <div class="flex items-center">
-    <img src="${item.image}" alt="${$item->name}" class="w-20 h-20 object-cover rounded-lg">
-    <div class="ml-4 flex-1">
-        <h3 class="text-lg font-medium text-gray-900">${item.name}</h3>
-        <p class="mt-1 text-sm text-gray-500">${item.category}</p>
-        <div class="mt-2 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <button type="button" class="quantity-btn p-1 rounded-md hover:bg-gray-100" data-action="decrease"
-                    data-product-id="${item.id}">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                    </svg>
-                </button>
-            </div>
-            <span class="font-medium text-gray-900">
-                ${this.formatPrice(item.price * item.quantity)}
-            </span>
-        </div>
-    </div>
-    <button class="ml-4 text-gray-400 hover:text-red-500" data-action="remove" data-product-id="${item.id}">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-    </button>
-</div> --}}
-
-
-{{-- <div class="p-5 text-center text-gray-500">
-    <p class="text-2xl">Your cart is empty</p>
-    <a href="/" class="text-emerald-600 hover:text-emerald-700">
-        Continue Shopping</a>
-</div> --}}

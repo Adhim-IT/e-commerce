@@ -10,6 +10,7 @@ class ShoppingCart {
         }
         this.updateCartCount();
         this.attachEventListeners();
+        this.handlePayButtonClick();
     }
     getCartFromStorage() {
         try {
@@ -37,30 +38,7 @@ class ShoppingCart {
         cartCount.textContent = totalItems;
         cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
     }
-    // addItem(product) {
-    //     if (!product?.id) return;
-    //     try {
-    //         const existingItem = this.items.find(item => item.id === parseInt(product.id));
-    //         if (existingItem) {
-    //             existingItem.quantity += 1;
-    //         } else {
-    //             this.items.push({
-    //                 id: parseInt(product.id),
-    //                 name: product.name,
-    //                 price: parseFloat(product.price),
-    //                 image: product.image,
-    //                 category: product.category_name,
-    //                 quantity: 1
-    //             });
-    //         }
-    //         this.saveCartToStoreStorage();
-    //         this.updateCartCount();
-    //         this.showNotification(`1 ${product.name} added to cart`);
-    //     } catch (error) {
-    //         console.error(error);
-    //         this.showNotification('Error adding item to cart');
-    //     }
-    // }
+
     addItem(product) {
         if (!product?.id) return;
         try {
@@ -88,17 +66,7 @@ class ShoppingCart {
     }
 
 
-    // removeItem(productId) {
-    //     try {
-    //         this.items = this.items.filter(item => item.id !== parseInt(productId));
-    //         this.saveCartToStoreStorage();
-    //         this.updateCartCount();
-    //         this.showNotification('Item removed from cart');
-    //     } catch (error) {
-    //         console.error(error);
-    //         this.showNotification('Error removing item from cart');
-    //     }
-    // }
+
     removeItem(productId) {
         try {
             this.items = this.items.filter(item => item.id !== parseInt(productId));
@@ -112,24 +80,6 @@ class ShoppingCart {
         }
     }
 
-    // updateQuantity(productId, changeAmount) {
-    //     try {
-    //         const item = this.items.find(item => item.id === parseInt(productId));
-    //         if (!item) return;
-
-    //         const newQuantity = item.quantity + changeAmount;
-    //         if (newQuantity < 1) {
-    //             this.removeItem(productId);
-    //             return;
-    //         }
-    //         item.quantity = newQuantity;
-    //         this.saveCartToStoreStorage();
-    //         this.updateCartCount();
-    //     } catch (error) {
-    //         console.error(error);
-    //         this.showNotification('Error updating cart count');
-    //     }
-    // }
     updateQuantity(productId, changeAmount) {
         try {
             const item = this.items.find(item => item.id === parseInt(productId));
@@ -202,8 +152,12 @@ class ShoppingCart {
             elements.checkout.className = isDisabled
                 ? 'mt-6 w-full bg-gray-300 cursor-not-allowed text-white py-3 px-4 rounded-lg'
                 : 'mt-6 w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700';
+
+            elements.checkout.addEventListener('click', () => this.showShippingForm(elements.checkout));
         }
     }
+
+
 
 
     createCartItemElement(item) {
@@ -245,6 +199,58 @@ class ShoppingCart {
         return div;
     }
 
+    showShippingForm(checkoutButton) {
+        const cartItemsContainer = document.querySelector('.cart-items');
+        if (!cartItemsContainer) {
+            console.error('Cart items container not found!');
+            return;
+        }
+
+        const quantityButtons = cartItemsContainer.querySelectorAll('.quantity-btn');
+        const removeButtons = cartItemsContainer.querySelectorAll('[data-action="remove"]');
+        quantityButtons.forEach(button => button.disabled = true);
+        removeButtons.forEach(button => button.disabled = true);
+
+        const formContainerId = 'shipping-form-container';
+        let formContainer = document.getElementById(formContainerId);
+
+        if (!formContainer) {
+            formContainer = document.createElement('div');
+            formContainer.id = formContainerId;
+            formContainer.className = 'mt-6 bg-gray-50 p-6 rounded-lg shadow-md';
+            formContainer.innerHTML = `
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Shipping Information</h2>
+                <form id="checkoutForm" class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" id="name" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input type="text" id="phone" name="phone" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label for="shipping_address" class="block text-sm font-medium text-gray-700">Shipping Address</label>
+                        <textarea id="shipping_address" name="shipping_address" rows="3" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                    </div>
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                        <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                    </div>
+                </form>
+            `;
+            cartItemsContainer.appendChild(formContainer);
+        }
+
+        const payButton = document.getElementById('payButton');
+        if (payButton) {
+            payButton.hidden = false;
+        }
+        checkoutButton.hidden = true;
+    }
+
+
+
     updateCartUI() {
         const cartContainer = document.querySelector('.cart-items');
         if (!cartContainer) return;
@@ -268,6 +274,7 @@ class ShoppingCart {
 
         this.items.forEach(item => {
             cartContent.appendChild(this.createCartItemElement(item));
+
         });
 
         cartContainer.appendChild(cartContent);
@@ -302,7 +309,7 @@ class ShoppingCart {
             }
         });
     }
-    
+
     attachEventListeners() {
         document.addEventListener('click', (e) => {
             const addToCartButton = e.target.closest('.add-to-cart-btn');
@@ -372,38 +379,82 @@ class ShoppingCart {
             }
         }
     }
-    handlePayment(snapToken, orderId, payButton){
+    handlePayButtonClick() {
+        const payButton = document.getElementById('payButton');
+        payButton.addEventListener('click', async () => {
+            await this.processPayment();
+        });
+    }
+
+    handlePayment(snapToken, orderId, payButton) {
+        if (!window.snap || typeof window.snap.pay !== 'function') {
+            console.error('Midtrans Snap is not initialized.');
+            this.showNotification('Payment gateway not initialized. Please refresh the page.', 'error');
+            payButton.disabled = false;
+            payButton.textContent = 'Pay Now';
+            return;
+        }
+
         window.snap.pay(snapToken, {
-            onSuccess: async(result) => {
-                await this.updateTransactionStatus(orderId, result, 'paid');
-                this.items=[];
+            onSuccess: async (result) => {
+                await this.updateOrderStatus(result, 'paid');
+                this.items = [];
                 this.saveCartToStoreStorage();
                 window.location.href = '/orders';
             },
-            onPending: async (result) =>{
-                await this.updateTransactionStatus(orderId, result, 'pending');
-                this.items=[];
+            onPending: async (result) => {
+                await this.updateOrderStatus(result, 'pending');
+                this.items = [];
                 this.saveCartToStoreStorage();
                 window.location.href = '/orders';
             },
-            onError: async (result) =>{
-                await this.updateTransactionStatus(orderId, result, 'Cancel');
-                this.showNotification('pembayaran gagal', 'error');
-                if(payButton){
-                    payButton.disabled = false
-                    payButton.textContent = 'Pay Now';
-                }
+            onError: async (result) => {
+                await this.updateOrderStatus(result, 'failed');
+                this.showNotification('Payment failed', 'error');
+                payButton.disabled = false;
+                payButton.textContent = 'Pay Now';
             },
             onClose: () => {
-                if(confirm('Apakah Anda Ingin melanjutkan pembayaran')){
+                if (confirm('Do you want to continue the payment?')) {
                     window.location.href = '/orders';
-                }else if (payButton){
-                    payButton.disabled = false
+                } else {
+                    payButton.disabled = false;
                     payButton.textContent = 'Pay Now';
                 }
+            },
+        });
+
+    }
+
+    updateOrderStatus(paymentResult, status) {
+        fetch('/payments/update-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+            body: JSON.stringify({
+                order_id: paymentResult.order_id,
+                transaction_id: paymentResult.transaction_id,
+                payment_type: paymentResult.payment_type,
+                status: status
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('Order status updated successfully:', data.message);
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                console.error('Failed to update order status:', data.message);
             }
         })
+        .catch(error => console.error('Error updating order status:', error));
     }
+
+
 
 }
 

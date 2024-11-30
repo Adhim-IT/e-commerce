@@ -74,4 +74,5 @@ Route::middleware('isAdmin')->group(function () {
 });
 
 Route::post('/checkout/process', [UserCheckoutController::class, "process"])->name('checkout.process');
-// Route::post('/payments/update-status', [UserCheckoutController::class, "updateStatus"])->name('payments.update-status');
+Route::post('/payments/update-status', [UserCheckoutController::class, "updateStatus"])->name('payments.update-status');
+
